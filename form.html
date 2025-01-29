@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cybersecurity Risk Assessment</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 700px;
+            margin-top: 50px;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        .step {
+            display: none;
+        }
+        .active-step {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h3 class="text-center mb-4" id="step-title">Step 1: System Characterization</h3>
+    
+    <!-- Step 1: System Characterization -->
+    <div class="step active-step" id="step-1">
+        <form onsubmit="nextStep(event, 2)">
+            <div class="mb-3">
+                <label class="form-label">Asset Name</label>
+                <input type="text" class="form-control" name="asset_name" placeholder="E.g., Web Server 1" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Asset Type</label>
+                <select class="form-control" name="asset_type" required>
+                    <option value="">Select...</option>
+                    <option>Server</option>
+                    <option>Database</option>
+                    <option>Network Device</option>
+                    <option>Application</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">System Owner</label>
+                <input type="text" class="form-control" name="system_owner" placeholder="E.g., IT Security Team" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Data Classification</label>
+                <select class="form-control" name="data_classification" required>
+                    <option>Public</option>
+                    <option>Internal</option>
+                    <option>Confidential</option>
+                    <option>Restricted</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Business Impact Level</label>
+                <select class="form-control" name="business_impact" required>
+                    <option>Low</option>
+                    <option>Medium</option>
+                    <option>High</option>
+                    <option>Critical</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">System Dependencies</label>
+                <input type="text" class="form-control" name="dependencies" placeholder="E.g., Depends on Authentication Server">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Hosting Environment</label>
+                <select class="form-control" name="hosting_env">
+                    <option>On-Premise</option>
+                    <option>Cloud</option>
+                    <option>Hybrid</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">System Interfaces</label>
+                <textarea class="form-control" name="interfaces" placeholder="E.g., APIs, Web Interfaces, External Connections"></textarea>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Data Sensitivity</label>
+                <select class="form-control" name="data_sensitivity">
+                    <option>Low</option>
+                    <option>Medium</option>
+                    <option>High</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">System Criticality</label>
+                <select class="form-control" name="system_criticality">
+                    <option>Low</option>
+                    <option>Medium</option>
+                    <option>High</option>
+                    <option>Critical</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Operational Environment</label>
+                <select class="form-control" name="operational_env">
+                    <option>Production</option>
+                    <option>Development</option>
+                    <option>Staging</option>
+                    <option>Testing</option>
+                </select>
+            </div>
+            <div class="text-end">
+                <button type="submit" class="btn btn-primary">Next Step →</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Step 2: Threat Identification -->
+    <div class="step" id="step-2">
+        <form onsubmit="nextStep(event, 3)">
+            <div class="mb-3">
+                <label class="form-label">Threat Source Type</label>
+                <select class="form-control" name="threat_source" required>
+                    <option>Insider</option>
+                    <option>External Hacker</option>
+                    <option>Environmental</option>
+                    <option>Accidental</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Threat Category</label>
+                <select class="form-control" name="threat_category" required>
+                    <option>Malware</option>
+                    <option>Phishing</option>
+                    <option>DDoS</option>
+                    <option>Unauthorized Access</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Threat Description</label>
+                <textarea class="form-control" name="threat_description" required></textarea>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Historical Occurrence?</label>
+                <select class="form-control" name="historical_occurrence" required>
+                    <option>Yes</option>
+                    <option>No</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Data Source (MISP integration)</label>
+                <input type="text" class="form-control" name="data_source" placeholder="Live threat feed from MISP" required>
+            </div>
+            <div class="text-end">
+                <button type="submit" class="btn btn-primary">Next Step →</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Step 3: Vulnerability Identification -->
+    <div class="step" id="step-3">
+        <form onsubmit="nextStep(event, 4)">
+            <div class="mb-3">
+                <label class="form-label">Known Vulnerability?</label>
+                <select class="form-control" name="known_vulnerability" required>
+                    <option>Yes</option>
+                    <option>No</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Vulnerability Category</label>
+                <select class="form-control" name="vulnerability_category" required>
+                    <option>Weak Authentication</option>
+                    <option>Unpatched Software</option>
+                    <option>Misconfiguration</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Exploitability Level</label>
+                <select class="form-control" name="exploitability_level" required>
+                    <option>Easy</option>
+                    <option>Moderate</option>
+                    <option>Difficult</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Security Checklist Compliance</label>
+                <textarea class="form-control" name="security_compliance" required></textarea>
+            </div>
+            <div class="text-end">
+                <button type="submit" class="btn btn-primary">Next Step →</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Step 4: Control Analysis -->
+    <div class="step" id="step-4">
+        <form onsubmit="nextStep(event, 5)">
+            <div class="mb-3">
+                <label class="form-label">Existing Controls?</label>
+                <select class="form-control" name="existing_controls" required>
+                    <option>Firewall</option>
+                    <option>Multi-Factor Authentication</option>
+                    <option>Logging</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Control Type</label>
+                <select class="form-control" name="control_type" required>
+                    <option>Preventive</option>
+                    <option>Detective</option>
+                    <option>Corrective</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Effectiveness Rating</label>
+                <select class="form-control" name="effectiveness_rating" required>
+                    <option>High</option>
+                    <option>Medium</option>
+                    <option>Low</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Gaps Identified?</label>
+                <textarea class="form-control" name="gaps_identified" required></textarea>
+            </div>
+            <div class="text-end">
+                <button type="submit" class="btn btn-primary">Next Step →</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Step 5: Likelihood Estimation -->
+    <div class="step" id="step-5">
+        <form onsubmit="nextStep(event, 6)">
+            <div class="mb-3">
+                <label class="form-label">Likelihood Level</label>
+                <select class="form-control" name="likelihood_level" required>
+                    <option>Very Low</option>
+                    <option>Low</option>
+                    <option>Medium</option>
+                    <option>High</option>
+                    <option>Very High</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Likelihood Justification</label>
+                <textarea class="form-control" name="likelihood_justification" required></textarea>
+            </div>
+            <div class="text-end">
+                <button type="submit" class="btn btn-primary">Next Step →</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Step 6: Impact Assessment -->
+    <div class="step" id="step-6">
+        <form onsubmit="nextStep(event, 7)">
+            <div class="mb-3">
+                <label class="form-label">Impact Level</label>
+                <select class="form-control" name="impact_level" required>
+                    <option>Very Low</option>
+                    <option>Low</option>
+                    <option>Medium</option>
+                    <option>High</option>
+                    <option>Very High</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Impact Justification</label>
+                <textarea class="form-control" name="impact_justification" required></textarea>
+            </div>
+            <div class="text-end">
+                <button type="submit" class="btn btn-primary">Next Step →</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Step 7: Risk Calculation -->
+    <div class="step" id="step-7">
+        <form onsubmit="nextStep(event, 8)">
+            <div class="mb-3">
+                <label class="form-label">Risk Formula (Likelihood × Impact)</label>
+                <input type="text" class="form-control" name="risk_formula" readonly value="Likelihood × Impact">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Calculated Risk</label>
+                <input type="text" class="form-control" name="calculated_risk" readonly value="Calculated Risk Value">
+            </div>
+            <div class="text-end">
+                <button type="submit" class="btn btn-primary">Next Step →</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Step 8: Residual Risk Assessment -->
+    <div class="step" id="step-8">
+        <form onsubmit="nextStep(event, 9)">
+            <div class="mb-3">
+                <label class="form-label">Residual Risk Level</label>
+                <select class="form-control" name="residual_risk" required>
+                    <option>Very Low</option>
+                    <option>Low</option>
+                    <option>Medium</option>
+                    <option>High</option>
+                    <option>Very High</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Residual Risk Justification</label>
+                <textarea class="form-control" name="residual_risk_justification" required></textarea>
+            </div>
+            <div class="text-end">
+                <button type="submit" class="btn btn-primary">Next Step →</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Step 9: Conclusion and Reporting -->
+    <div class="step" id="step-9">
+        <form>
+            <div class="mb-3">
+                <label class="form-label">Report Summary</label>
+                <textarea class="form-control" name="report_summary" placeholder="Final Risk Assessment Report" readonly></textarea>
+            </div>
+            <div class="text-end">
+                <button type="submit" class="btn btn-success">Generate Report</button>
+            </div>
+        </form>
+    </div>
+
+</div>
+
+<script>
+    function nextStep(event, step) {
+        event.preventDefault();  // Prevent form submission
+        document.querySelector(`#step-${step - 1}`).classList.remove('active-step');
+        document.querySelector(`#step-${step}`).classList.add('active-step');
+        document.querySelector('#step-title').innerText = `Step ${step}: Your Step Title Here`;  // Update step title dynamically
+    }
+</script>
+
+</body>
+</html>
