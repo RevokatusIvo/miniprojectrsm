@@ -366,38 +366,11 @@
         renderProjects();
       });
       function viewProject(index) {
-        const project = projects[index];
-        const modalContent = document.querySelector(".modal-content");
-        modalContent.innerHTML = `
-        <div class="modal-header">
-            <h2>${project.name} Details</h2>
-            <button class="close-modal" onclick="closeModal()">&times;</button>
-        </div>
-        <div class="project-details">
-            <div class="detail-section">
-                <h3>Basic Information</h3>
-                <p><strong>Asset Name:</strong> ${project.name}</p>
-                <p><strong>Asset Type:</strong> ${project.type}</p>
-                <p><strong>System Owner:</strong> ${project.details.systemOwner}</p>
-                <p><strong>Description:</strong> ${project.description}</p>
-            </div>
-            
-            <div class="detail-section">
-                <h3>Risk Assessment</h3>
-                <p><strong>Threat Level:</strong> ${project.threatLevel}</p>
-                <p><strong>Impact Level:</strong> ${project.impactLevel}</p>
-                <p><strong>Residual Risk:</strong> ${project.riskLevel}</p>
-            </div>
-
-            <div class="detail-section">
-                <h3>Additional Details</h3>
-                <p><strong>Vulnerabilities:</strong> ${project.details.vulnerabilities}</p>
-                <p><strong>Existing Controls:</strong> ${project.details.controls}</p>
-            </div>
-        </div>
-    `;
-        document.getElementById("projectModal").style.display = "flex";
-      }
+    // Simpan index project yang dipilih
+    localStorage.setItem('selectedProjectIndex', index);
+    // Redirect ke dashboard
+    window.location.href = 'dashboard.html';
+}
 
       // Add edit functionality
       function editProject(index) {
