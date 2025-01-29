@@ -1,0 +1,174 @@
+<!-- dashboard.html -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="dashboard.css" />
+  </head>
+  <body>
+    <div class="container">
+      <!-- Sidebar -->
+      <!-- Add this to your existing HTML, replacing the old sidebar -->
+<div class="sidebar" id="sidebar">
+    <div class="sidebar-header">        
+        <button class="toggle-btn" id="toggleSidebar">☰</button>
+    </div>
+    
+    <div class="sidebar-content">
+        <div class="nav-section">
+            <h3>Main Menu</h3>
+            <a href="#" class="nav-item active">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="form.html" class="nav-item">
+                <i class="fas fa-chart-bar"></i>
+                <span>Analytics</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-users"></i>
+                <span>Users</span>
+            </a>
+        </div>
+
+        <div class="nav-section">
+            <h3>Settings</h3>
+            <a href="#" class="nav-item">
+                <i class="fas fa-cog"></i>
+                <span>General</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-shield-alt"></i>
+                <span>Security</span>
+            </a>
+        </div>
+    </div>
+</div>
+
+      <!-- Main Content -->
+      <div class="main-content">
+        <!-- Top Navigation -->
+        <div class="top-nav">
+          <button class="tab-btn active">Customer Data Warehouse</button>
+          <button class="tab-btn">CRM Database ×</button>
+          <button class="tab-btn">Employee Records ×</button>
+          <button class="tab-btn">AWS Servers ×</button>
+        </div>
+
+        <!-- Dashboard Content -->
+        <div class="dashboard-grid">
+          <!-- Left Panel -->
+          <div class="panel">
+            <h2>A list of key assets in the system, which could include:</h2>
+            <ul>
+              <li>Hardware (e.g., servers, networking devices).</li>
+              <li>Software (e.g., databases, application code).</li>
+              <li>
+                Data (e.g., customer data, financial data, intellectual
+                property).
+              </li>
+              <li>Processes (e.g., workflows, critical functions).</li>
+            </ul>
+
+            <table class="metrics-table">
+              <tr>
+                <th>Metric</th>
+                <th>Value</th>
+              </tr>
+              <tr>
+                <td>Total Threats</td>
+                <td>15</td>
+              </tr>
+              <tr>
+                <td>Threat Types</td>
+                <td>Phishing, Malware</td>
+              </tr>
+              <tr>
+                <td>Highest Risk</td>
+                <td>Financial Data</td>
+              </tr>
+            </table>
+
+            <div id="donutChart"></div>
+            <!-- Add these inside the left panel, after the donutChart div -->
+            <div class="chart-container">
+              <h3>Threat Detection Trend</h3>
+              <div id="lineChart"></div>
+            </div>
+
+            <div class="chart-container">
+              <h3>Security Measures Implementation</h3>
+              <div id="barChart"></div>
+            </div>
+          </div>
+
+          <!-- Right Panel -->
+          <div class="right-panels">
+            <div class="panel">
+              <h2>System Description:</h2>
+              <p>
+                Figma ipsum component variant main layer. Pen mask object
+                vertical ipsum team shadow group variant blur. Layer prototype
+                team thumbnail figma. Arrow inspect ellipse layout background
+                figjam auto image team. Draft arrange figma create rectangle
+                subtract scrolling.
+              </p>
+            </div>
+
+            <div class="panel info-panel">
+              <div class="info-section">
+                <h3>Data Types:</h3>
+                <ul>
+                  <li>Personally Identifiable Information (PII).</li>
+                  <li>Financial Data.</li>
+                </ul>
+              </div>
+
+              <div class="info-section">
+                <h3>Impact Levels:</h3>
+                <ul>
+                  <li>High: Employee Payroll Data.</li>
+                  <li>Medium: Performance Reviews.</li>
+                </ul>
+              </div>
+
+              <div class="info-section">
+                <h3>Selected Controls:</h3>
+                <ul>
+                  <li>Access Control (AC-2).</li>
+                  <li>Encryption (SC-12).</li>
+                  <li>Backup and Recovery (CP-9).</li>
+                </ul>
+              </div>
+
+              <div class="info-section">
+                <h3>Tasks Completed:</h3>
+                <ul>
+                  <li>Encryption enabled for sensitive data.</li>
+                  <li>User roles configured.</li>
+                  <li>Backups automated weekly.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Progress Tracker -->
+        <div class="progress-section">
+          <div class="progress-header">
+            <h2>Progress Tracker: 4/9</h2>
+            <button class="continue-btn">Continue to Step 5: Assess</button>
+          </div>
+          <div class="progress-bar">
+            <div class="progress" style="width: 44%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="dashboard.js"></script>
+  </body>
+</html>
