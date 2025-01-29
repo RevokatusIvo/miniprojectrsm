@@ -3,32 +3,225 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cybersecurity Risk Assessment</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <title>Risk Assessment Form</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        :root {
+            --primary-color: #4a90e2;
+            --sidebar-bg: #1a2233;
+            --main-bg: #f4f6f9;
+            --card-bg: #ffffff;
+            --text-primary: #2c3e50;
+            --text-secondary: #95a5a6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            background-color: #f8f9fa;
+            font-family: 'Segoe UI', sans-serif;
+            background: var(--main-bg);
         }
-        .container {
-            max-width: 700px;
-            margin-top: 50px;
-            background: #ffffff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+
+        .wrapper {
+            display: flex;
+            min-height: 100vh;
         }
+
+       /* Sidebar Styles */
+.sidebar {
+    width: 250px;
+    background: var(--sidebar-bg);
+    color: white;
+    transition: all 0.3s ease;
+    padding: 1rem;
+}
+
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.logo {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    margin-right: 1rem;
+}
+
+.nav-links {
+    list-style: none;
+    margin-top: 2rem;
+}
+
+.nav-links li {
+    margin-bottom: 0.5rem;
+}
+
+.nav-links a {
+    display: flex;
+    align-items: center;
+    padding: 0.8rem 1rem;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.nav-links a:hover,
+.nav-links .active a {
+    background: rgba(255,255,255,0.1);
+}
+
+.nav-links i {
+    margin-right: 1rem;
+}
+
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+        }
+
+        .form-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
         .step {
             display: none;
         }
+
         .active-step {
             display: block;
         }
+
+        .form-header {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+        }
+
+        .btn-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #357abd;
+        }
+
+        .progress-bar {
+            height: 4px;
+            background: #eee;
+            margin-bottom: 2rem;
+            border-radius: 2px;
+        }
+
+        .progress {
+            height: 100%;
+            background: var(--primary-color);
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+        
     </style>
 </head>
 <body>
+    <div class="wrapper">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <img src="https://via.placeholder.com/40" alt="Logo" class="logo">
+                <span>Risk Assessment</span>
+            </div>
+            
+            <ul class="nav-links">
+                <li>
+                    <a href="dashboard.html">
+                        <i class="fas fa-chart-pie"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="active">
+                    <a href="form.html">
+                        <i class="fas fa-analytics"></i>
+                        <span>Analytics</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="project.html">
+                        <i class="fas fa-project-diagram"></i>
+                        <span>Projects</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i class="fas fa-cog"></i>
+                        <span>Settings</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
 
-<div class="container">
-    <h3 class="text-center mb-4" id="step-title">Step 1: System Characterization</h3>
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="form-container">
+                <div class="form-header">
+                    <h2 id="step-title">Step 1: System Characterization</h2>
+                </div>
+                
+                <div class="progress-bar">
+                    <div class="progress" id="progress-bar"></div>
+                </div>
     
     <!-- Step 1: System Characterization -->
     <div class="step active-step" id="step-1">
@@ -263,21 +456,179 @@
                 <label class="form-label">Report Summary</label>
                 <textarea class="form-control" name="report_summary" placeholder="Final Risk Assessment Report" readonly></textarea>
             </div>
-            <div class="text-end">
-                <button type="submit" class="btn btn-success">Generate Report</button>
-            </div>
+            <!-- In Step 9 form -->
+<div class="text-end">
+    <button type="submit" class="btn btn-success" id="submitFinalForm">Generate Report</button>
+</div>
         </form>
     </div>
 
 </div>
 
 <script>
-    function nextStep(event, step) {
-        event.preventDefault();  // Prevent form submission
-        document.querySelector(`#step-${step - 1}`).classList.remove('active-step');
-        document.querySelector(`#step-${step}`).classList.add('active-step');
-        document.querySelector('#step-title').innerText = `Step ${step}: Your Step Title Here`;  // Update step title dynamically
+    // In form.html, replace the existing script with this:
+// Replace your existing nextStep function with this:
+function nextStep(event, step) {
+    event.preventDefault();
+    
+    // Get form data from current step
+    const currentForm = event.target;
+    const formData = new FormData(currentForm);
+    
+    // Save to temporary storage
+    for (let [key, value] of formData.entries()) {
+        localStorage.setItem(key, value);
     }
+
+    // If this is the final step (step 9)
+    if (step === 9) {
+        // Collect all data from localStorage and create project
+        const projectData = {
+            id: Date.now(),
+            name: localStorage.getItem('asset_name'),
+            type: localStorage.getItem('asset_type'),
+            description: localStorage.getItem('system_description') || '',
+            status: 'Active',
+            riskLevel: localStorage.getItem('residual_risk'),
+            threatLevel: localStorage.getItem('threat_source'),
+            impactLevel: localStorage.getItem('impact_level'),
+            dateCreated: new Date().toISOString(),
+            details: {
+                systemOwner: localStorage.getItem('system_owner'),
+                vulnerabilities: localStorage.getItem('vulnerability_description') || '',
+                controls: localStorage.getItem('existing_controls'),
+                dataClassification: localStorage.getItem('data_classification'),
+                businessImpact: localStorage.getItem('business_impact'),
+                threatCategory: localStorage.getItem('threat_category'),
+                likelihoodLevel: localStorage.getItem('likelihood_level'),
+                likelihoodJustification: localStorage.getItem('likelihood_justification'),
+                impactJustification: localStorage.getItem('impact_justification'),
+                residualRiskJustification: localStorage.getItem('residual_risk_justification')
+            }
+        };
+
+        // Get existing projects or create new array
+        let projects = JSON.parse(localStorage.getItem('riskProjects')) || [];
+        
+        // Add new project
+        projects.push(projectData);
+        
+        // Save updated projects array
+        localStorage.setItem('riskProjects', JSON.stringify(projects));
+
+        // Redirect to projects page
+        window.location.href = 'project.html';
+        return;
+    }
+
+    // Update progress bar
+    const progress = ((step - 1) / 9) * 100;
+    document.getElementById('progress-bar').style.width = `${progress}%`;
+
+    // Continue to next step
+    document.querySelector(`#step-${step - 1}`).classList.remove('active-step');
+    document.querySelector(`#step-${step}`).classList.add('active-step');
+    
+    // Update step title
+    const titles = {
+        1: 'System Characterization',
+        2: 'Threat Identification',
+        3: 'Vulnerability Identification',
+        4: 'Control Analysis',
+        5: 'Likelihood Estimation',
+        6: 'Impact Assessment',
+        7: 'Risk Calculation',
+        8: 'Residual Risk Assessment',
+        9: 'Conclusion and Reporting'
+    };
+    document.querySelector('#step-title').innerText = `Step ${step}: ${titles[step]}`;
+}
+
+function generateReport() {
+    const reportData = {
+        assetName: localStorage.getItem('asset_name'),
+        assetType: localStorage.getItem('asset_type'),
+        threatLevel: localStorage.getItem('likelihood_level'),
+        impactLevel: localStorage.getItem('impact_level'),
+        riskLevel: localStorage.getItem('residual_risk'),
+        timestamp: new Date().toISOString()
+    };
+    localStorage.setItem('reportData', JSON.stringify(reportData));
+}
+// Add this to your form.html
+function submitForm(event) {
+    event.preventDefault();
+    
+    // Create project object from all form inputs
+    const projectData = {
+        id: Date.now(),
+        name: document.getElementById('asset_name').value,
+        type: document.getElementById('asset_type').value,
+        description: document.getElementById('system_description').value,
+        status: 'Active',
+        riskLevel: document.getElementById('residual_risk').value,
+        threatLevel: document.getElementById('threat_level').value,
+        impactLevel: document.getElementById('impact_level').value,
+        dateCreated: new Date().toISOString(),
+        details: {
+            systemOwner: document.getElementById('system_owner').value,
+            vulnerabilities: document.getElementById('vulnerability_description').value,
+            controls: document.getElementById('existing_controls').value,
+            // Add any other form fields you want to capture
+        }
+    };
+
+    // Get existing projects or initialize empty array
+    let projects = JSON.parse(localStorage.getItem('riskProjects')) || [];
+    
+    // Add new project
+    projects.push(projectData);
+    
+    // Save to localStorage
+    localStorage.setItem('riskProjects', JSON.stringify(projects));
+
+    // Redirect to projects page
+    window.location.href = 'project.html';
+}
+
+// Add this function to handle form submission
+function handleFormSubmission(event) {
+    event.preventDefault();
+    
+    // Create project data object
+    const formData = {
+        id: Date.now(),
+        name: document.getElementById('asset_name').value,
+        type: document.getElementById('asset_type').value,
+        description: document.getElementById('system_description').value,
+        status: 'Active',
+        dateCreated: new Date().toISOString(),
+        details: {
+            systemOwner: document.getElementById('system_owner').value,
+            vulnerabilities: document.getElementById('vulnerability_description').value,
+            controls: document.getElementById('existing_controls').value,
+            threatLevel: document.getElementById('threat_level').value,
+            impactLevel: document.getElementById('impact_level').value,
+            riskLevel: document.getElementById('residual_risk').value
+        }
+    };
+
+    // Save to localStorage
+    let existingProjects = JSON.parse(localStorage.getItem('riskProjects')) || [];
+    existingProjects.push(formData);
+    localStorage.setItem('riskProjects', JSON.stringify(existingProjects));
+
+    // Also save for dashboard
+    let dashboardData = JSON.parse(localStorage.getItem('dashboardData')) || [];
+    dashboardData.push(formData);
+    localStorage.setItem('dashboardData', JSON.stringify(dashboardData));
+
+    // Redirect to project page
+    window.location.href = 'project.html';
+}
+
+// Add event listener to your form
+document.getElementById('riskAssessmentForm').addEventListener('submit', handleFormSubmission);
 </script>
 
 </body>

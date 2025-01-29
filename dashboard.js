@@ -1,116 +1,77 @@
 // dashboard.js
 document.addEventListener('DOMContentLoaded', function() {
-    // Donut Chart
-    const donutCtx = document.createElement('canvas');
-    document.getElementById('donutChart').appendChild(donutCtx);
+    // Toggle Sidebar
+    document.getElementById('sidebarToggle').addEventListener('click', function() {
+        document.querySelector('.sidebar').classList.toggle('collapsed');
+        document.querySelector('.main-content').classList.toggle('expanded');
+    });
 
-    new Chart(donutCtx, {
+    // Load form data from localStorage
+    const formData = {};
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        formData[key] = localStorage.getItem(key);
+    }
+
+    // Update dashboard elements
+    updateDashboardData(formData);
+    createDonutChart(formData);
+});
+
+function updateDashboardData(data) {
+    // Update quick stats
+    document.getElementById('riskLevel').textContent = data.residual_risk || 'N/A';
+    document.getElementById('threatCount').textContent = data.threat_category ? '1 Active' : 'None';
+    document.getElementById('controlCount').textContent = data.existing_controls || 'N/A';
+
+    // Update system details
+    document.getElementById('assetName').textContent = data.asset_name || 'N/A';
+    document.getElementById('assetType').textContent = data.asset_type || 'N/A';
+    document.getElementById('systemOwner').textContent = data.system_owner || 'N/A';
+
+    // Update threat assessment
+    document.getElementById('threatSource').textContent = data.threat_source || 'N/A';
+    document.getElementById('vulnerabilityLevel').textContent = data.exploitability_level || 'N/A';
+    document.getElementById('impactLevel').textContent = data.impact_level || 'N/A';
+}
+
+function createDonutChart(data) {
+    const ctx = document.createElement('canvas');
+    document.getElementById('donutChart').appendChild(ctx);
+
+    new Chart(ctx, {
         type: 'doughnut',
         data: {
-            labels: ['High Risk', 'Medium Risk', 'Low Risk'],
+            labels: ['Impact', 'Likelihood', 'Residual Risk'],
             datasets: [{
-                data: [30, 50, 20],
-                backgroundColor: [
-                    '#1e40af',
-                    '#60a5fa',
-                    '#93c5fd',
+                data: [
+                    getRiskValue(data.impact_level),
+                    getRiskValue(data.likelihood_level),
+                    getRiskValue(data.residual_risk)
                 ],
-                borderWidth: 0
+                backgroundColor: ['#4a90e2', '#2ecc71', '#e74c3c']
             }]
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
             plugins: {
                 legend: {
-                    position: 'bottom',
-                    labels: {
-                        color: 'white'
-                    }
+                    position: 'bottom'
                 }
             },
             cutout: '70%'
         }
     });
+}
 
-    // Line Chart
-    const lineCtx = document.createElement('canvas');
-    document.getElementById('lineChart').appendChild(lineCtx);
-
-    new Chart(lineCtx, {
-        type: 'line',
-        data: {
-            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-            datasets: [{
-                label: 'Threats Detected',
-                data: [12, 19, 15, 25, 22, 30],
-                borderColor: '#60a5fa',
-                tension: 0.4
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    labels: {
-                        color: 'white'
-                    }
-                }
-            },
-            scales: {
-                y: {
-                    ticks: { color: 'white' }
-                },
-                x: {
-                    ticks: { color: 'white' }
-                }
-            }
-        }
-    });
-
-    // Bar Chart
-    const barCtx = document.createElement('canvas');
-    document.getElementById('barChart').appendChild(barCtx);
-
-    new Chart(barCtx, {
-        type: 'bar',
-        data: {
-            labels: ['Access Control', 'Encryption', 'Firewall', 'Backup'],
-            datasets: [{
-                label: 'Security Measures',
-                data: [85, 90, 75, 95],
-                backgroundColor: '#60a5fa'
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    labels: {
-                        color: 'white'
-                    }
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: { color: 'white' }
-                },
-                x: {
-                    ticks: { color: 'white' }
-                }
-            }
-        }
-    });
-});
-
-// Add this to your JavaScript file
-document.addEventListener('DOMContentLoaded', function() {
-    const sidebar = document.getElementById('sidebar');
-    const toggleBtn = document.getElementById('toggleSidebar');
-    const mainContent = document.querySelector('.main-content');
-
-    toggleBtn.addEventListener('click', function() {
-        sidebar.classList.toggle('expanded');
-        mainContent.classList.toggle('shifted');
-    });
-});
+function getRiskValue(level) {
+    const values = {
+        'Very Low': 20,
+        'Low': 40,
+        'Medium': 60,
+        'High': 80,
+        'Very High': 100
+    };
+    return values[level] || 0;
+}

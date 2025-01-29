@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Projects Dashboard</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <style>
+      :root {
+        --primary-color: #4a90e2;
+        --sidebar-bg: #1a2233;
+        --main-bg: #f4f6f9;
+        --card-bg: #ffffff;
+        --text-primary: #2c3e50;
+        --text-secondary: #95a5a6;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", sans-serif;
+        background: var(--main-bg);
+      }
+
+      .wrapper {
+        display: flex;
+        min-height: 100vh;
+      }
+
+      /* Sidebar Styles */
+      .sidebar {
+        width: 250px;
+        background: var(--sidebar-bg);
+        color: white;
+        transition: all 0.3s ease;
+        padding: 1rem;
+      }
+
+      .sidebar-header {
+        display: flex;
+        align-items: center;
+        padding: 1rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .logo {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        margin-right: 1rem;
+      }
+
+      .nav-links {
+        list-style: none;
+        margin-top: 2rem;
+      }
+
+      .nav-links li {
+        margin-bottom: 0.5rem;
+      }
+
+      .nav-links a {
+        display: flex;
+        align-items: center;
+        padding: 0.8rem 1rem;
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+      }
+
+      .nav-links a:hover,
+      .nav-links .active a {
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      .nav-links i {
+        margin-right: 1rem;
+      }
+
+      /* Main Content Styles */
+      .main-content {
+        flex: 1;
+        padding: 2rem;
+      }
+
+      .projects-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+      }
+
+      .add-project-btn {
+        background: var(--primary-color);
+        color: white;
+        padding: 0.8rem 1.5rem;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .projects-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+      }
+
+      .project-card {
+        background: var(--card-bg);
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .project-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        margin-bottom: 1rem;
+      }
+
+      .project-actions {
+        display: flex;
+        gap: 0.5rem;
+      }
+
+      .action-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 0.5rem;
+        border-radius: 4px;
+        transition: all 0.3s ease;
+      }
+
+      .action-btn:hover {
+        background: rgba(0, 0, 0, 0.1);
+      }
+
+      .project-status {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        margin-top: 1rem;
+      }
+
+      .status-active {
+        background: #e1f7e1;
+        color: #2ecc71;
+      }
+
+      .status-pending {
+        background: #fff3e0;
+        color: #f39c12;
+      }
+
+      /* Modal Styles */
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        align-items: center;
+        justify-content: center;
+      }
+
+      .modal-content {
+        background: white;
+        padding: 2rem;
+        border-radius: 12px;
+        width: 90%;
+        max-width: 500px;
+      }
+
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+      }
+
+      .close-modal {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+      }
+
+      .form-group {
+        margin-bottom: 1.5rem;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+      }
+
+      .form-control {
+        width: 100%;
+        padding: 0.8rem;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+      }
+
+      .risk-indicators {
+        display: flex;
+        gap: 1rem;
+        margin: 1rem 0;
+      }
+
+      .risk-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.875rem;
+      }
+
+      .risk-badge.threat {
+        background: #ffe5e5;
+        color: #dc3545;
+      }
+
+      .risk-badge.impact {
+        background: #e5f6ff;
+        color: #0d6efd;
+      }
+
+      .project-date {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        margin-top: 1rem;
+      }
+
+      .project-details {
+        margin-top: 1rem;
+      }
+
+      .project-details p {
+        margin-bottom: 0.5rem;
+      }
+
+      .project-details ul {
+        margin-left: 1.5rem;
+        margin-top: 0.5rem;
+      }
+
+      .close-modal {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        padding: 0.5rem;
+        transition: all 0.3s ease;
+      }
+
+      .close-modal:hover {
+        color: #dc3545;
+        transform: scale(1.1);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrapper">
+      <!-- Sidebar -->
+      <nav class="sidebar">
+        <div class="sidebar-header">
+          <div class="logo">TID</div>
+          <span>Risk Assessment</span>
+        </div>
+
+        <ul class="nav-links">
+          <li class="active">
+            <a href="dashboard.html">
+              <i class="fas fa-chart-pie"></i>
+              <span>Dashboard</span>
+            </a>
+          </li>
+          <li>
+            <a href="form.html">
+              <i class="fas fa-analytics"></i>
+              <span>Analytics</span>
+            </a>
+          </li>
+          <li>
+            <a href="project.html">
+              <i class="fas fa-project-diagram"></i>
+              <span>Projects</span>
+            </a>
+          </li>
+          <li>
+            <a href="#">
+              <i class="fas fa-cog"></i>
+              <span>Settings</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- Main Content -->
+      <div class="main-content">
+        <div class="projects-header">
+          <h1>Projects</h1>
+          <button class="add-project-btn" onclick="openModal()">
+            <i class="fas fa-plus"></i>
+            Add Project
+          </button>
+        </div>
+
+        <div class="projects-grid" id="projectsGrid"></div>
+      </div>
+    </div>
+
+    <!-- Add/Edit Project Modal -->
+    <div class="modal" id="projectModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 id="modalTitle">Add New Project</h2>
+          <button class="close-modal" onclick="closeModal()">&times;</button>
+        </div>
+        <form id="projectForm" onsubmit="saveProject(event)">
+          <div class="form-group">
+            <label for="projectName">Project Name</label>
+            <input type="text" id="projectName" class="form-control" required />
+          </div>
+          <div class="form-group">
+            <label for="projectDescription">Description</label>
+            <textarea
+              id="projectDescription"
+              class="form-control"
+              rows="3"
+              required
+            ></textarea>
+          </div>
+          <div class="form-group">
+            <label for="projectStatus">Status</label>
+            <select id="projectStatus" class="form-control" required>
+              <option value="active">Active</option>
+              <option value="pending">Pending</option>
+            </select>
+          </div>
+          <button type="submit" class="add-project-btn">Save Project</button>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      // Tambahkan ini di bagian atas script project.html
+      let projects = JSON.parse(localStorage.getItem("riskProjects")) || [];
+
+      // Panggil renderProjects saat halaman dimuat
+      document.addEventListener("DOMContentLoaded", function () {
+        renderProjects();
+      });
+      function viewProject(index) {
+        const project = projects[index];
+        const modalContent = document.querySelector(".modal-content");
+        modalContent.innerHTML = `
+        <div class="modal-header">
+            <h2>${project.name} Details</h2>
+            <button class="close-modal" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="project-details">
+            <div class="detail-section">
+                <h3>Basic Information</h3>
+                <p><strong>Asset Name:</strong> ${project.name}</p>
+                <p><strong>Asset Type:</strong> ${project.type}</p>
+                <p><strong>System Owner:</strong> ${project.details.systemOwner}</p>
+                <p><strong>Description:</strong> ${project.description}</p>
+            </div>
+            
+            <div class="detail-section">
+                <h3>Risk Assessment</h3>
+                <p><strong>Threat Level:</strong> ${project.threatLevel}</p>
+                <p><strong>Impact Level:</strong> ${project.impactLevel}</p>
+                <p><strong>Residual Risk:</strong> ${project.riskLevel}</p>
+            </div>
+
+            <div class="detail-section">
+                <h3>Additional Details</h3>
+                <p><strong>Vulnerabilities:</strong> ${project.details.vulnerabilities}</p>
+                <p><strong>Existing Controls:</strong> ${project.details.controls}</p>
+            </div>
+        </div>
+    `;
+        document.getElementById("projectModal").style.display = "flex";
+      }
+
+      // Add edit functionality
+      function editProject(index) {
+        const project = projects[index];
+        window.location.href = `form.html?edit=${index}`;
+      }
+
+      function renderProjects() {
+        const grid = document.getElementById("projectsGrid");
+        grid.innerHTML = "";
+
+        projects.forEach((project, index) => {
+          const card = document.createElement("div");
+          card.className = "project-card";
+          card.innerHTML = `
+            <div class="project-header">
+                <h3>${project.name}</h3>
+                <div class="project-actions">
+                    <button class="action-btn" onclick="viewProject(${index})">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="action-btn" onclick="editProject(${index})">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="action-btn" onclick="deleteProject(${index})">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="project-info">
+                <p><strong>Asset Type:</strong> ${project.type}</p>
+                <p><strong>Risk Level:</strong> ${project.riskLevel}</p>
+                <div class="risk-indicators">
+                    <span class="risk-badge threat">Threat: ${
+                      project.threatLevel
+                    }</span>
+                    <span class="risk-badge impact">Impact: ${
+                      project.impactLevel
+                    }</span>
+                </div>
+            </div>
+            <span class="project-status status-${project.status.toLowerCase()}">${
+            project.status
+          }</span>
+            <div class="project-date">Created: ${new Date(
+              project.dateCreated
+            ).toLocaleDateString()}</div>
+        `;
+          grid.appendChild(card);
+        });
+      }
+
+      // Fungsi untuk menutup modal
+      function closeModal() {
+        document.getElementById("projectModal").style.display = "none";
+      }
+
+      // Fungsi untuk menghapus project
+      function deleteProject(index) {
+        // Konfirmasi penghapusan
+        if (confirm("Are you sure you want to delete this project?")) {
+          // Ambil data dari localStorage
+          let projects = JSON.parse(localStorage.getItem("riskProjects")) || [];
+
+          // Hapus project dengan index yang sesuai
+          projects.splice(index, 1);
+
+          // Simpan kembali ke localStorage
+          localStorage.setItem("riskProjects", JSON.stringify(projects));
+
+          // Render ulang tampilan
+          renderProjects();
+        }
+      }
+    </script>
+  </body>
+</html>
