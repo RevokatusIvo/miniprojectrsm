@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Risk Assessment</title>
+    <link rel="stylesheet" href="/static/sidebar.css">
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --sidebar-bg: #1a2233;
+            --main-bg: #f4f6f9;
+            --card-bg: #ffffff;
+            --text-primary: #2c3e50;
+            --text-secondary: #95a5a6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: var(--main-bg);
+        }
+
+        .wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+        }
+
+        .form-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .step {
+            display: none;
+        }
+
+        .active-step {
+            display: block;
+        }
+
+        .form-header {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+        }
+
+        .btn-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #357abd;
+        }
+
+        .progress-bar {
+            height: 4px;
+            background: #eee;
+            margin-bottom: 2rem;
+            border-radius: 2px;
+        }
+
+        .progress {
+            height: 100%;
+            background: var(--primary-color);
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div id="sidebar-container"></div>
+        <div class="main-content">
+            <div class="form-container">
+                <div class="form-header">
+                    <h2 id="step-title">Edit Risk Assessment</h2>
+                </div>
+                
+                <div class="progress-bar">
+                    <div class="progress" id="progress-bar"></div>
+                </div>
+
+                <!-- Step 1: System Characterization -->
+                <div class="step active-step" id="step-1">
+                    <form onsubmit="nextStep(event, 2)">
+                        <div class="form-group">
+                            <label class="form-label">Asset Name</label>
+                            <input type="text" class="form-control" name="asset_name" value="{{ assessment.asset_name }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Asset Type</label>
+                            <select class="form-control" name="asset_type" required>
+                                <option value="{{ assessment.asset_type }}">{{ assessment.asset_type }}</option>
+                                <option>Server</option>
+                                <option>Database</option>
+                                <option>Network Device</option>
+                                <option>Application</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">System Owner</label>
+                            <input type="text" class="form-control" name="system_owner" value="{{ assessment.system_owner }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Data Classification</label>
+                            <select class="form-control" name="data_classification" required>
+                                <option value="{{ assessment.data_classification }}">{{ assessment.data_classification }}</option>
+                                <option>Public</option>
+                                <option>Internal</option>
+                                <option>Confidential</option>
+                                <option>Restricted</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Business Impact Level</label>
+                            <select class="form-control" name="business_impact" required>
+                                <option value="{{ assessment.business_impact }}">{{ assessment.business_impact }}</option>
+                                <option>Low</option>
+                                <option>Medium</option>
+                                <option>High</option>
+                                <option>Critical</option>
+                            </select>
+                        </div>
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-primary">Next Step →</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Step 2: Threat Identification -->
+                <div class="step" id="step-2">
+                    <form onsubmit="nextStep(event, 3)">
+                        <div class="form-group">
+                            <label class="form-label">Threat Source Type</label>
+                            <select class="form-control" name="threat_source" required>
+                                <option value="{{ assessment.threat_source }}">{{ assessment.threat_source }}</option>
+                                <option>Insider</option>
+                                <option>External Hacker</option>
+                                <option>Environmental</option>
+                                <option>Accidental</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Threat Category</label>
+                            <select class="form-control" name="threat_category" required>
+                                <option value="{{ assessment.threat_category }}">{{ assessment.threat_category }}</option>
+                                <option>Malware</option>
+                                <option>Phishing</option>
+                                <option>DDoS</option>
+                                <option>Unauthorized Access</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Threat Description</label>
+                            <textarea class="form-control" name="threat_description" required>{{ assessment.threat_description }}</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Historical Occurrence?</label>
+                            <select class="form-control" name="historical_occurrence" required>
+                                <option value="{{ assessment.historical_occurrence }}">{{ assessment.historical_occurrence }}</option>
+                                <option>Yes</option>
+                                <option>No</option>
+                            </select>
+                        </div>
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-primary">Next Step →</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Step 3: Vulnerability Identification -->
+                <div class="step" id="step-3">
+                    <form onsubmit="nextStep(event, 4)">
+                        <div class="form-group">
+                            <label class="form-label">Known Vulnerability?</label>
+                            <select class="form-control" name="known_vulnerability" required>
+                                <option value="{{ assessment.known_vulnerability }}">{{ assessment.known_vulnerability }}</option>
+                                <option>Yes</option>
+                                <option>No</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Vulnerability Category</label>
+                            <select class="form-control" name="vulnerability_category" required>
+                                <option value="{{ assessment.vulnerability_category }}">{{ assessment.vulnerability_category }}</option>
+                                <option>Weak Authentication</option>
+                                <option>Unpatched Software</option>
+                                <option>Misconfiguration</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Exploitability Level</label>
+                            <select class="form-control" name="exploitability_level" required>
+                                <option value="{{ assessment.exploitability_level }}">{{ assessment.exploitability_level }}</option>
+                                <option>Easy</option>
+                                <option>Moderate</option>
+                                <option>Difficult</option>
+                            </select>
+                        </div>
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-primary">Next Step →</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Step 4: Control Analysis -->
+                <div class="step" id="step-4">
+                    <form onsubmit="nextStep(event, 5)">
+                        <div class="form-group">
+                            <label class="form-label">Existing Controls?</label>
+                            <select class="form-control" name="existing_controls" required>
+                                <option value="{{ assessment.existing_controls }}">{{ assessment.existing_controls }}</option>
+                                <option>Firewall</option>
+                                <option>Multi-Factor Authentication</option>
+                                <option>Logging</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Control Type</label>
+                            <select class="form-control" name="control_type" required>
+                                <option value="{{ assessment.control_type }}">{{ assessment.control_type }}</option>
+                                <option>Preventive</option>
+                                <option>Detective</option>
+                                <option>Corrective</option>
+                            </select>
+                        </div>
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-primary">Next Step →</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Step 5: Likelihood Estimation -->
+                <div class="step" id="step-5">
+                    <form onsubmit="nextStep(event, 6)">
+                        <div class="form-group">
+                            <label class="form-label">Likelihood Level</label>
+                            <select class="form-control" name="likelihood_level" required>
+                                <option value="{{ assessment.likelihood_level }}">{{ assessment.likelihood_level }}</option>
+                                <option>Low</option>
+                                <option>Medium</option>
+                                <option>High</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Likelihood Justification</label>
+                            <textarea class="form-control" name="likelihood_justification" required>{{ assessment.likelihood_justification }}</textarea>
+                        </div>
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-primary">Next Step →</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Step 6: Impact Assessment -->
+                <div class="step" id="step-6">
+                    <form onsubmit="nextStep(event, 7)">
+                        <div class="form-group">
+                            <label class="form-label">Impact Level</label>
+                            <select class="form-control" name="impact_level" required>
+                                <option value="{{ assessment.impact_level }}">{{ assessment.impact_level }}</option>
+                               
+                                <option>Low</option>
+                                <option>Medium</option>
+                                <option>High</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Impact Justification</label>
+                            <textarea class="form-control" name="impact_justification" required>{{ assessment.impact_justification }}</textarea>
+                        </div>
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-primary">Next Step →</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Step 7: Risk Calculation -->
+                <div class="step" id="step-7">
+                    <form onsubmit="nextStep(event, 8)">
+                        <div class="form-group">
+                            <label class="form-label">Risk Formula (Likelihood × Impact)</label>
+                            <input type="text" class="form-control" name="risk_formula" readonly value="Likelihood × Impact">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Calculated Risk</label>
+                            <input type="text" class="form-control" name="calculated_risk" readonly value="{{ assessment.calculated_risk }}">
+                        </div>
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-primary">Next Step →</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Step 8: Residual Risk Assessment -->
+                <div class="step" id="step-8">
+                    <form onsubmit="nextStep(event, 9)">
+                        <div class="form-group">
+                            <label class="form-label">Residual Risk Level</label>
+                            <select class="form-control" name="residual_risk" required>
+                                <option value="{{ assessment.residual_risk }}">{{ assessment.residual_risk }}</option>
+                                <option>Low</option>
+                                <option>Medium</option>
+                                <option>High</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Residual Risk Justification</label>
+                            <textarea class="form-control" name="residual_risk_justification" required>{{ assessment.residual_risk_justification }}</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Control Recommendations </label>
+                            <textarea class="form-control" name="control_recommendations" required>{{ assessment.control_recommendations }}</textarea>
+                        </div>
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-primary">Next Step →</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Step 9: Conclusion and Reporting -->
+                <div class="step" id="step-9">
+                    <form onsubmit="submitFinalForm(event)">
+                        <div class="form-group">
+                            <label class="form-label">Report Summary</label>
+                            <textarea class="form-control" name="report_summary" placeholder="Final Risk Assessment Report" readonly>{{ assessment.report_summary }}</textarea>
+                        </div>
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-success">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <script src="/static/sidebar.js"></script>
+    <script>
+        async function nextStep(event, step) {
+        event.preventDefault();
+        const currentForm = event.target;
+        const formData = new FormData(currentForm);
+        const data = {};
+        
+        // Convert FormData to regular object and remove empty values
+        for (let [key, value] of formData.entries()) {
+            if (value !== '') {
+                data[key] = value;
+            }
+        }
+        
+        // Only send data if we have values to update
+        if (Object.keys(data).length > 0) {
+            try {
+                const response = await fetch('/edit_assessment/{{ assessment.id }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to save changes');
+                }
+            } catch (error) {
+                console.error('Error saving form:', error);
+                alert('Failed to save changes. Please try again.');
+                return;
+            }
+        }
+        
+        // Update progress and move to next step
+        const progress = ((step - 1) / 9) * 100;
+        document.getElementById('progress-bar').style.width = `${progress}%`;
+        
+        document.querySelector(`#step-${step - 1}`).classList.remove('active-step');
+        document.querySelector(`#step-${step}`).classList.add('active-step');
+        
+        const titles = {
+            1: 'System Characterization',
+            2: 'Threat Identification',
+            3: 'Vulnerability Identification',
+            4: 'Control Analysis',
+            5: 'Likelihood Estimation',
+            6: 'Impact Assessment',
+            7: 'Risk Calculation',
+            8: 'Control Recommendations',
+            9: 'Conclusion and Reporting'
+        };
+        document.querySelector('#step-title').innerText = `Step ${step}: ${titles[step]}`;
+    }
+
+    async function submitFinalForm(event) {
+        event.preventDefault();
+        const finalFormData = new FormData(event.target);
+        const data = {};
+        
+        // Convert FormData to regular object and remove empty values
+        for (let [key, value] of finalFormData.entries()) {
+            if (value !== '') {
+                data[key] = value;
+            }
+        }
+        
+        try {
+            const response = await fetch('/edit_assessment/{{ assessment.id }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            });
+            
+            if (response.ok) {
+                window.location.href = '/projects';
+            } else {
+                throw new Error('Failed to save changes');
+            }
+        } catch (error) {
+            console.error('Error saving form:', error);
+            alert('Failed to save changes. Please try again.');
+        }
+    }
+    </script>
+</body>
+</html>

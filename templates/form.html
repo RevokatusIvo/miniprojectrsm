@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Risk Assessment Form</title>
-    <link rel="stylesheet" href="sidebar.css">
+    <link rel="stylesheet" href="/static/sidebar.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
@@ -287,11 +287,9 @@
             <div class="mb-3">
                 <label class="form-label">Likelihood Level</label>
                 <select class="form-control" name="likelihood_level" required>
-                    <option>Very Low</option>
                     <option>Low</option>
                     <option>Medium</option>
                     <option>High</option>
-                    <option>Very High</option>
                 </select>
             </div>
             <div class="mb-3">
@@ -310,11 +308,9 @@
             <div class="mb-3">
                 <label class="form-label">Impact Level</label>
                 <select class="form-control" name="impact_level" required>
-                    <option>Very Low</option>
                     <option>Low</option>
                     <option>Medium</option>
                     <option>High</option>
-                    <option>Very High</option>
                 </select>
             </div>
             <div class="mb-3">
@@ -350,16 +346,16 @@
             <div class="mb-3">
                 <label class="form-label">Residual Risk Level</label>
                 <select class="form-control" name="residual_risk" required>
-                    <option>Very Low</option>
                     <option>Low</option>
                     <option>Medium</option>
                     <option>High</option>
-                    <option>Very High</option>
                 </select>
             </div>
             <div class="mb-3">
                 <label class="form-label">Residual Risk Justification</label>
                 <textarea class="form-control" name="residual_risk_justification" required></textarea>
+                <label class="form-label">Control Recommendations </label>
+                <textarea class="form-control" name="control_recommendations"></textarea>
             </div>
             <div class="text-end">
                 <button type="submit" class="btn btn-primary">Next Step →</button>
@@ -375,179 +371,82 @@
                 <textarea class="form-control" name="report_summary" placeholder="Final Risk Assessment Report" readonly></textarea>
             </div>
             <!-- In Step 9 form -->
-<div class="text-end">
-    <button type="submit" class="btn btn-success" id="submitFinalForm">Generate Report</button>
-</div>
+            <div class="text-end">
+                <button type="submit" class="btn btn-success" id="submitFinalForm">Generate Report</button>
+            </div>
         </form>
     </div>
 
 </div>
-<script src="sidebar.js"></script>
+<script src="/static/sidebar.js"></script>
 
 <script>
-    // In form.html, replace the existing script with this:
-// Replace your existing nextStep function with this:
-function nextStep(event, step) {
+            let currentAssessmentId = null;
+
+async function nextStep(event, step) {
     event.preventDefault();
     
-    // Get form data from current step
     const currentForm = event.target;
     const formData = new FormData(currentForm);
+    const data = Object.fromEntries(formData.entries());
     
-    // Save to temporary storage
-    for (let [key, value] of formData.entries()) {
-        localStorage.setItem(key, value);
-    }
-
-    // If this is the final step (step 9)
-    if (step === 9) {
-        // Collect all data from localStorage and create project
-        const projectData = {
-            id: Date.now(),
-            name: localStorage.getItem('asset_name'),
-            type: localStorage.getItem('asset_type'),
-            description: localStorage.getItem('system_description') || '',
-            status: 'Active',
-            riskLevel: localStorage.getItem('residual_risk'),
-            threatLevel: localStorage.getItem('threat_source'),
-            impactLevel: localStorage.getItem('impact_level'),
-            dateCreated: new Date().toISOString(),
-            details: {
-                systemOwner: localStorage.getItem('system_owner'),
-                vulnerabilities: localStorage.getItem('vulnerability_description') || '',
-                controls: localStorage.getItem('existing_controls'),
-                dataClassification: localStorage.getItem('data_classification'),
-                businessImpact: localStorage.getItem('business_impact'),
-                threatCategory: localStorage.getItem('threat_category'),
-                likelihoodLevel: localStorage.getItem('likelihood_level'),
-                likelihoodJustification: localStorage.getItem('likelihood_justification'),
-                impactJustification: localStorage.getItem('impact_justification'),
-                residualRiskJustification: localStorage.getItem('residual_risk_justification')
+    data.step = step - 1;
+    data.assessment_id = currentAssessmentId;
+    
+    try {
+        const response = await fetch('/save_step', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+            currentAssessmentId = result.assessment_id;
+            
+            if (step === 9) {
+                const finalResponse = await fetch('/submit_assessment', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ assessment_id: currentAssessmentId })
+                });
+                
+                const finalResult = await finalResponse.json();
+                if (finalResult.success) {
+                    window.location.href = '/projects';
+                    return;
+                }
             }
-        };
-
-        // Get existing projects or create new array
-        let projects = JSON.parse(localStorage.getItem('riskProjects')) || [];
-        
-        // Add new project
-        projects.push(projectData);
-        
-        // Save updated projects array
-        localStorage.setItem('riskProjects', JSON.stringify(projects));
-
-        // Redirect to projects page
-        window.location.href = 'project.html';
-        return;
+            
+            // Update progress and navigation
+            const progress = ((step - 1) / 9) * 100;
+            document.getElementById('progress-bar').style.width = `${progress}%`;
+            
+            document.querySelector(`#step-${step - 1}`).classList.remove('active-step');
+            document.querySelector(`#step-${step}`).classList.add('active-step');
+            
+            const titles = {
+                1: 'System Characterization',
+                2: 'Threat Identification',
+                3: 'Vulnerability Identification',
+                4: 'Control Analysis',
+                5: 'Likelihood Estimation',
+                6: 'Impact Assessment',
+                7: 'Risk Calculation',
+                8: 'Control Recommendations',
+                9: 'Conclusion and Reporting'
+            };
+            document.querySelector('#step-title').innerText = `Step ${step}: ${titles[step]}`;
+        }
+    } catch (error) {
+        console.error('Error saving step:', error);
     }
-
-    // Update progress bar
-    const progress = ((step - 1) / 9) * 100;
-    document.getElementById('progress-bar').style.width = `${progress}%`;
-
-    // Continue to next step
-    document.querySelector(`#step-${step - 1}`).classList.remove('active-step');
-    document.querySelector(`#step-${step}`).classList.add('active-step');
-    
-    // Update step title
-    const titles = {
-        1: 'System Characterization',
-        2: 'Threat Identification',
-        3: 'Vulnerability Identification',
-        4: 'Control Analysis',
-        5: 'Likelihood Estimation',
-        6: 'Impact Assessment',
-        7: 'Risk Calculation',
-        8: 'Residual Risk Assessment',
-        9: 'Conclusion and Reporting'
-    };
-    document.querySelector('#step-title').innerText = `Step ${step}: ${titles[step]}`;
 }
 
-function generateReport() {
-    const reportData = {
-        assetName: localStorage.getItem('asset_name'),
-        assetType: localStorage.getItem('asset_type'),
-        threatLevel: localStorage.getItem('likelihood_level'),
-        impactLevel: localStorage.getItem('impact_level'),
-        riskLevel: localStorage.getItem('residual_risk'),
-        timestamp: new Date().toISOString()
-    };
-    localStorage.setItem('reportData', JSON.stringify(reportData));
-}
-// Add this to your form.html
-function submitForm(event) {
-    event.preventDefault();
-    
-    // Create project object from all form inputs
-    const projectData = {
-        id: Date.now(),
-        name: document.getElementById('asset_name').value,
-        type: document.getElementById('asset_type').value,
-        description: document.getElementById('system_description').value,
-        status: 'Active',
-        riskLevel: document.getElementById('residual_risk').value,
-        threatLevel: document.getElementById('threat_level').value,
-        impactLevel: document.getElementById('impact_level').value,
-        dateCreated: new Date().toISOString(),
-        details: {
-            systemOwner: document.getElementById('system_owner').value,
-            vulnerabilities: document.getElementById('vulnerability_description').value,
-            controls: document.getElementById('existing_controls').value,
-            // Add any other form fields you want to capture
-        }
-    };
-
-    // Get existing projects or initialize empty array
-    let projects = JSON.parse(localStorage.getItem('riskProjects')) || [];
-    
-    // Add new project
-    projects.push(projectData);
-    
-    // Save to localStorage
-    localStorage.setItem('riskProjects', JSON.stringify(projects));
-
-    // Redirect to projects page
-    window.location.href = 'project.html';
-}
-
-// Add this function to handle form submission
-function handleFormSubmission(event) {
-    event.preventDefault();
-    
-    // Create project data object
-    const formData = {
-        id: Date.now(),
-        name: document.getElementById('asset_name').value,
-        type: document.getElementById('asset_type').value,
-        description: document.getElementById('system_description').value,
-        status: 'Active',
-        dateCreated: new Date().toISOString(),
-        details: {
-            systemOwner: document.getElementById('system_owner').value,
-            vulnerabilities: document.getElementById('vulnerability_description').value,
-            controls: document.getElementById('existing_controls').value,
-            threatLevel: document.getElementById('threat_level').value,
-            impactLevel: document.getElementById('impact_level').value,
-            riskLevel: document.getElementById('residual_risk').value
-        }
-    };
-
-    // Save to localStorage
-    let existingProjects = JSON.parse(localStorage.getItem('riskProjects')) || [];
-    existingProjects.push(formData);
-    localStorage.setItem('riskProjects', JSON.stringify(existingProjects));
-
-    // Also save for dashboard
-    let dashboardData = JSON.parse(localStorage.getItem('dashboardData')) || [];
-    dashboardData.push(formData);
-    localStorage.setItem('dashboardData', JSON.stringify(dashboardData));
-
-    // Redirect to project page
-    window.location.href = 'project.html';
-}
-
-// Add event listener to your form
-document.getElementById('riskAssessmentForm').addEventListener('submit', handleFormSubmission);
 </script>
 
 </body>

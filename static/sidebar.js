@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 async function loadSidebar() {
     try {
-        const response = await fetch('sidebar.html');
+        const response = await fetch('/static/sidebar.html');
         const data = await response.text();
         document.querySelector('.wrapper').insertAdjacentHTML('afterbegin', data);
     } catch (error) {
