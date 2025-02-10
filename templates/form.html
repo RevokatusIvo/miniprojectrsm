@@ -344,7 +344,7 @@
     <div class="step" id="step-8">
         <form onsubmit="nextStep(event, 9)">
             <div class="mb-3">
-                <label class="form-label">Residual Risk Level</label>
+                <label class="form-label">Control Recommendation</label>
                 <select class="form-control" name="residual_risk" required>
                     <option>Low</option>
                     <option>Medium</option>
@@ -364,15 +364,145 @@
     </div>
 
     <!-- Step 9: Conclusion and Reporting -->
-    <div class="step" id="step-9">
+    <!-- <div class="step" id="step-9">
         <form>
             <div class="mb-3">
                 <label class="form-label">Report Summary</label>
                 <textarea class="form-control" name="report_summary" placeholder="Final Risk Assessment Report" readonly></textarea>
             </div>
-            <!-- In Step 9 form -->
+           
             <div class="text-end">
                 <button type="submit" class="btn btn-success" id="submitFinalForm">Generate Report</button>
+            </div>
+        </form>
+    </div> -->
+    <div class="step" id="step-9">
+        <form>
+            <div class="mb-3">
+                <h3 class="form-label">Risk Assessment Summary</h3>
+                
+                <!-- System Characterization -->
+                <div class="summary-section mb-4">
+                    <h4>System Characterization</h4>
+                    <div class="summary-grid">
+                        <div class="summary-item">
+                            <label>Asset Name:</label>
+                            <span id="summary-asset-name"></span>
+                        </div>
+                        <div class="summary-item">
+                            <label>Asset Type:</label>
+                            <span id="summary-asset-type"></span>
+                        </div>
+                        <div class="summary-item">
+                            <label>System Owner:</label>
+                            <span id="summary-system-owner"></span>
+                        </div>
+                        <div class="summary-item">
+                            <label>Data Classification:</label>
+                            <span id="summary-data-classification"></span>
+                        </div>
+                        <div class="summary-item">
+                            <label>Business Impact:</label>
+                            <span id="summary-business-impact"></span>
+                        </div>
+                    </div>
+                </div>
+    
+                <!-- Threat Identification -->
+                <div class="summary-section mb-4">
+                    <h4>Threat Identification</h4>
+                    <div class="summary-grid">
+                        <div class="summary-item">
+                            <label>Threat Source:</label>
+                            <span id="summary-threat-source"></span>
+                        </div>
+                        <div class="summary-item">
+                            <label>Threat Category:</label>
+                            <span id="summary-threat-category"></span>
+                        </div>
+                        <div class="summary-item">
+                            <label>Historical Occurrence:</label>
+                            <span id="summary-historical-occurrence"></span>
+                        </div>
+                        <div class="summary-item full-width">
+                            <label>Threat Description:</label>
+                            <span id="summary-threat-description"></span>
+                        </div>
+                    </div>
+                </div>
+    
+                <!-- Vulnerability Identification -->
+                <div class="summary-section mb-4">
+                    <h4>Vulnerability Assessment</h4>
+                    <div class="summary-grid">
+                        <div class="summary-item">
+                            <label>Known Vulnerability:</label>
+                            <span id="summary-known-vulnerability"></span>
+                        </div>
+                        <div class="summary-item">
+                            <label>Vulnerability Category:</label>
+                            <span id="summary-vulnerability-category"></span>
+                        </div>
+                        <div class="summary-item">
+                            <label>Exploitability Level:</label>
+                            <span id="summary-exploitability-level"></span>
+                        </div>
+                    </div>
+                </div>
+    
+                <!-- Control Analysis -->
+                <div class="summary-section mb-4">
+                    <h4>Control Analysis</h4>
+                    <div class="summary-grid">
+                        <div class="summary-item">
+                            <label>Existing Controls:</label>
+                            <span id="summary-existing-controls"></span>
+                        </div>
+                        <div class="summary-item">
+                            <label>Control Type:</label>
+                            <span id="summary-control-type"></span>
+                        </div>
+                    </div>
+                </div>
+    
+                <!-- Risk Assessment -->
+                <div class="summary-section mb-4">
+                    <h4>Risk Assessment</h4>
+                    <div class="summary-grid">
+                        <div class="summary-item">
+                            <label>Likelihood Level:</label>
+                            <span id="summary-likelihood-level"></span>
+                        </div>
+                        <div class="summary-item">
+                            <label>Impact Level:</label>
+                            <span id="summary-impact-level"></span>
+                        </div>
+                        <div class="summary-item">
+                            <label>Residual Risk Level:</label>
+                            <span id="summary-residual-risk"></span>
+                        </div>
+                        <div class="summary-item full-width">
+                            <label>Likelihood Justification:</label>
+                            <span id="summary-likelihood-justification"></span>
+                        </div>
+                        <div class="summary-item full-width">
+                            <label>Impact Justification:</label>
+                            <span id="summary-impact-justification"></span>
+                        </div>
+                        <div class="summary-item full-width">
+                            <label>Residual Risk Justification:</label>
+                            <span id="summary-residual-risk-justification"></span>
+                        </div>
+                        <div class="summary-item full-width">
+                            <label>Control Recommendations:</label>
+                            <span id="summary-control-recommendations"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="btn-container">
+                <button type="button" class="btn btn-primary" onclick="downloadPDF()">Download PDF Report</button>
+                <button type="submit" class="btn btn-success" id="submitFinalForm">Submit Assessment</button>
             </div>
         </form>
     </div>
@@ -381,7 +511,57 @@
 <script src="/static/sidebar.js"></script>
 
 <script>
-            let currentAssessmentId = null;
+    let currentAssessmentId = null;
+
+async function populateSummary() {
+    try {
+        const response = await fetch(`/assessment/${currentAssessmentId}`);
+        const data = await response.json();
+        
+        // Populate all summary fields
+        document.getElementById('summary-asset-name').textContent = data.asset_name;
+        document.getElementById('summary-asset-type').textContent = data.asset_type;
+        document.getElementById('summary-system-owner').textContent = data.system_owner;
+        document.getElementById('summary-data-classification').textContent = data.details.data_classification;
+        document.getElementById('summary-business-impact').textContent = data.details.business_impact;
+        document.getElementById('summary-threat-source').textContent = data.details.threat_source;
+        document.getElementById('summary-threat-category').textContent = data.details.threat_category;
+        document.getElementById('summary-historical-occurrence').textContent = data.historical_occurrence;
+        document.getElementById('summary-threat-description').textContent = data.threat_description;
+        document.getElementById('summary-known-vulnerability').textContent = data.known_vulnerability;
+        document.getElementById('summary-vulnerability-category').textContent = data.details.vulnerability_category;
+        document.getElementById('summary-exploitability-level').textContent = data.exploitability_level;
+        document.getElementById('summary-existing-controls').textContent = data.details.existing_controls;
+        document.getElementById('summary-control-type').textContent = data.control_type;
+        document.getElementById('summary-likelihood-level').textContent = data.threat_level;
+        document.getElementById('summary-impact-level').textContent = data.impact_level;
+        document.getElementById('summary-residual-risk').textContent = data.risk_level;
+        document.getElementById('summary-likelihood-justification').textContent = data.likelihood_justification;
+        document.getElementById('summary-impact-justification').textContent = data.impact_justification;
+        document.getElementById('summary-residual-risk-justification').textContent = data.residual_risk_justification;
+        document.getElementById('summary-control-recommendations').textContent = data.control_recommendations;
+    } catch (error) {
+        console.error('Error populating summary:', error);
+    }
+}
+
+async function downloadPDF() {
+    try {
+        const response = await fetch(`/generate_pdf/${currentAssessmentId}`);
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `risk_assessment_${currentAssessmentId}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+    } catch (error) {
+        console.error('Error downloading PDF:', error);
+        alert('Error downloading PDF. Please try again.');
+    }
+}
 
 async function nextStep(event, step) {
     event.preventDefault();
@@ -406,22 +586,6 @@ async function nextStep(event, step) {
         if (result.success) {
             currentAssessmentId = result.assessment_id;
             
-            if (step === 9) {
-                const finalResponse = await fetch('/submit_assessment', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ assessment_id: currentAssessmentId })
-                });
-                
-                const finalResult = await finalResponse.json();
-                if (finalResult.success) {
-                    window.location.href = '/projects';
-                    return;
-                }
-            }
-            
             // Update progress and navigation
             const progress = ((step - 1) / 9) * 100;
             document.getElementById('progress-bar').style.width = `${progress}%`;
@@ -441,6 +605,29 @@ async function nextStep(event, step) {
                 9: 'Conclusion and Reporting'
             };
             document.querySelector('#step-title').innerText = `Step ${step}: ${titles[step]}`;
+            
+            // If moving to step 9, populate the summary
+            if (step === 9) {
+                await populateSummary();
+                
+                // Set up the submit button handler
+                const submitButton = document.getElementById('submitFinalForm');
+                submitButton.onclick = async (e) => {
+                    e.preventDefault();
+                    const finalResponse = await fetch('/submit_assessment', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ assessment_id: currentAssessmentId })
+                    });
+                    
+                    const finalResult = await finalResponse.json();
+                    if (finalResult.success) {
+                        window.location.href = '/projects';
+                    }
+                };
+            }
         }
     } catch (error) {
         console.error('Error saving step:', error);

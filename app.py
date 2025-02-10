@@ -1,11 +1,213 @@
-from flask import Flask, render_template, request, jsonify, redirect, url_for
+from flask import Flask, render_template, request, jsonify, redirect, url_for,send_file
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+from pymisp import PyMISP
+import json
+import os
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import letter
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from io import BytesIO
 
 app = Flask(__name__)
+@app.route('/generate_pdf/<int:assessment_id>')
+def generate_pdf(assessment_id):
+    assessment = RiskAssessment.query.get_or_404(assessment_id)
+    
+    # Create a buffer for the PDF
+    buffer = BytesIO()
+    
+    # Create the PDF object
+    doc = SimpleDocTemplate(buffer, pagesize=letter)
+    styles = getSampleStyleSheet()
+    elements = []
+    
+    # Title
+    title_style = ParagraphStyle(
+        'CustomTitle',
+        parent=styles['Heading1'],
+        fontSize=24,
+        spaceAfter=30
+    )
+    elements.append(Paragraph(f"Risk Assessment Report", title_style))
+    elements.append(Spacer(1, 12))
+    
+    # Define sections and their data
+    sections = [
+        ("System Characterization", [
+            ("Asset Name", assessment.asset_name),
+            ("Asset Type", assessment.asset_type),
+            ("System Owner", assessment.system_owner),
+            ("Data Classification", assessment.data_classification),
+            ("Business Impact", assessment.business_impact)
+        ]),
+        ("Threat Identification", [
+            ("Threat Source", assessment.threat_source),
+            ("Threat Category", assessment.threat_category),
+            ("Historical Occurrence", assessment.historical_occurrence),
+            ("Threat Description", assessment.threat_description)
+        ]),
+        ("Vulnerability Assessment", [
+            ("Known Vulnerability", assessment.known_vulnerability),
+            ("Vulnerability Category", assessment.vulnerability_category),
+            ("Exploitability Level", assessment.exploitability_level)
+        ]),
+        ("Control Analysis", [
+            ("Existing Controls", assessment.existing_controls),
+            ("Control Type", assessment.control_type)
+        ]),
+        ("Risk Assessment", [
+            ("Likelihood Level", assessment.likelihood_level),
+            ("Impact Level", assessment.impact_level),
+            ("Residual Risk", assessment.residual_risk),
+            ("Likelihood Justification", assessment.likelihood_justification),
+            ("Impact Justification", assessment.impact_justification),
+            ("Residual Risk Justification", assessment.residual_risk_justification),
+            ("Control Recommendations", assessment.control_recommendations)
+        ])
+    ]
+    
+    # Add each section to the PDF
+    for section_title, section_data in sections:
+        elements.append(Paragraph(section_title, styles['Heading2']))
+        elements.append(Spacer(1, 12))
+        
+        # Create table for section data
+        data = [[Paragraph(str(key), styles['Heading4']), 
+                Paragraph(str(value), styles['Normal'])] 
+                for key, value in section_data]
+        
+        table = Table(data, colWidths=[150, 350])
+        table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (0, -1), colors.lightgrey),
+            ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 12),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+            ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),
+            ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+            ('FONTSIZE', (0, 1), (-1, -1), 10),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black),
+            ('TOPPADDING', (0, 0), (-1, -1), 6),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+            ('LEFTPADDING', (0, 0), (-1, -1), 6),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 6),
+        ]))
+        elements.append(table)
+        elements.append(Spacer(1, 20))
+    
+    # Build PDF
+    doc.build(elements)
+    
+    # Prepare response
+    buffer.seek(0)
+    return send_file(
+        buffer,
+        download_name=f'risk_assessment_{assessment_id}.pdf',
+        as_attachment=True,
+        mimetype='application/pdf'
+    )
+
+# Existing imports and configuration remain the same...
+
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///risk_assessment.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
+
+# Add MISP configuration
+app.config['MISP_URL'] = 'https://192.168.56.102'
+app.config['MISP_KEY'] = '2reFFzBzZgD1dyXFGsjSZLHbHtCeUw7dmAfH9bwn'
+app.config['MISP_VERIFY_CERT'] = False
+
+# Initialize MISP
+def init_misp():
+    return PyMISP(
+        app.config['MISP_URL'],
+        app.config['MISP_KEY'],
+        app.config['MISP_VERIFY_CERT']
+    )
+
+# Add new MISP-related routes and functions
+@app.route('/misp/latest_threats')
+def get_latest_threats():
+    try:
+        misp = init_misp()
+        # Get events from the last 30 days
+        events = misp.search(controller='events', last='30d')
+        
+        processed_events = []
+        for event in events:
+            if isinstance(event, dict) and 'Event' in event:
+                event_data = event['Event']
+                processed_events.append({
+                    'id': event_data.get('id'),
+                    'date': event_data.get('date'),
+                    'threat_level': event_data.get('threat_level_id'),
+                    'info': event_data.get('info'),
+                    'analysis': event_data.get('analysis'),
+                    'tags': [tag['Tag']['name'] for tag in event_data.get('Tag', [])]
+                })
+        
+        return jsonify(processed_events)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/misp/indicators/<event_id>')
+def get_event_indicators(event_id):
+    try:
+        misp = init_misp()
+        event = misp.get_event(event_id)
+        
+        indicators = []
+        if event and 'Event' in event:
+            for attribute in event['Event'].get('Attribute', []):
+                indicators.append({
+                    'type': attribute.get('type'),
+                    'value': attribute.get('value'),
+                    'category': attribute.get('category'),
+                    'timestamp': attribute.get('timestamp')
+                })
+        
+        return jsonify(indicators)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/misp/dashboard')
+def misp_dashboard():
+    return render_template('misp_dashboard.html')
+
+# Add MISP correlation to risk assessments
+@app.route('/correlate_threats/<int:assessment_id>')
+def correlate_threats(assessment_id):
+    try:
+        assessment = RiskAssessment.query.get_or_404(assessment_id)
+        misp = init_misp()
+        
+        # Search for related threats based on asset type and vulnerability category
+        search_terms = f"{assessment.asset_type} {assessment.vulnerability_category}"
+        related_events = misp.search(controller='events', value=search_terms)
+        
+        correlated_threats = []
+        for event in related_events:
+            if isinstance(event, dict) and 'Event' in event:
+                event_data = event['Event']
+                correlated_threats.append({
+                    'id': event_data.get('id'),
+                    'date': event_data.get('date'),
+                    'info': event_data.get('info'),
+                    'threat_level': event_data.get('threat_level_id')
+                })
+        
+        return jsonify(correlated_threats)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    
+
 
 class RiskAssessment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
